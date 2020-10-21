@@ -1,49 +1,54 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package sptvr19myschool.entity;
 
-/**
- *
- * @author Comp
- */
-public class Subject {
+import java.io.Serializable;
+
+
+public class Subject implements Serializable{
     private String name;
     private Integer duration;
     private Person teacher;
 
-    public String getName() {
-        return name;
+    public Subject() {
     }
 
-    public Integer getDuration() {
-        return duration;
+    public Subject(String name, Integer duration, Person teacher) {
+        this.name = name;
+        this.duration = duration;
+        this.teacher = teacher;
     }
 
     public Person getTeacher() {
         return teacher;
     }
 
+    public void setTeacher(Person teacher) {
+        this.teacher = teacher;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getDuration() {
+        return duration;
     }
 
     public void setDuration(Integer duration) {
         this.duration = duration;
     }
 
-    public void setTeacher(Person teacher) {
-        this.teacher = teacher;
-    }
-
     @Override
     public String toString() {
-        return "Subject{"
+        return "Subject{" 
                 + "name=" + name 
                 + ", duration=" + duration 
-                + ", teacher=" + teacher 
+                + ", teacher=" + teacher.getFirstname()
+                + " " + teacher.getLastname()
                 + '}';
     }
     

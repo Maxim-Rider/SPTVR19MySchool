@@ -5,41 +5,72 @@
  */
 package sptvr19myschool.tools.managers;
 
-/**
- *
- * @author Comp
- */
 
+import java.util.List;
 import java.util.Scanner;
 import sptvr19myschool.entity.Person;
+import sptvr19myschool.tools.severs.SaveToFile;
 
-/**
- *
- * @author user
- */
 public class PersonManager {
-    public Person createBook() {
-        Person person = new Person();
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("--- Добавить ученика ---");
-        System.out.print("Его имя: ");
-        person.setfirstName(scanner.nextLine());
-        System.out.print("Его фамилия: ");
-        person.setlastname(scanner.nextLine());
-        System.out.print("Его номер телефона: ");
-        person.setphone(scanner.nextLine());       
-        return person;
-    }
-    public void addPersonToArray(Person person, Person[] students){
-        for (int i = 0; i < students.length; i++) {
-            if(students[i] == null){
-                students[i]=person;
-                break;
-            }
+    private Scanner scanner = new Scanner(System.in);
+    public Person createPerson(String role) {
+        if("STUDENT".equals(role)){
+            System.out.println("--- Добавление ученика ---");
+            System.out.println("Имя ученика: ");
+            String firstname = scanner.nextLine();
+            System.out.println("Фамилия ученика: ");
+            String lastname = scanner.nextLine();
+            System.out.println("Телефон: ");
+            String phone = scanner.nextLine();
+            Person student = new Person(firstname, lastname, phone, role);
+            return student;
+        }else{
+            System.out.println("--- Добавление учителя ---");
+            System.out.println("Имя учителя: ");
+            String firstname = scanner.nextLine();
+            System.out.println("Фамилия учителя: ");
+            String lastname = scanner.nextLine();
+            System.out.println("Телефон: ");
+            String phone = scanner.nextLine();
+            Person teacher = new Person(firstname, lastname, phone, role);
+            return teacher;
         }
     }
 
-    public void createPerson() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void addPersonToList(Person student, List<Person> listPersons) {
+        listPersons.add(student);   
+        SaveToFile saveToFile = new SaveToFile();
+        saveToFile.saveToFile(listPersons, "listPersons");
     }
+
+    public void printListStudents(List<Person> listPersons) {
+        System.out.println("--- Список учеников ---");
+        for (int i = 0; i < listPersons.size(); i++) {
+            Person person = listPersons.get(i);
+            if("STUDENT".equals(person.getRole())){
+                System.out.printf("%d. %s %s%n"
+                        ,i+1
+                        ,person.getFirstname()
+                        ,person.getLastname()
+                );
+            }
+            
+        }
+    }
+
+    public void printListTeachers(List<Person> listPersons) {
+        System.out.println("--- Список преподавателей ---");
+        for (int i = 0; i < listPersons.size(); i++) {
+            Person person = listPersons.get(i);
+            if("TEACHER".equals(person.getRole())){
+                System.out.printf("%d. %s %s%n"
+                        ,i+1
+                        ,person.getFirstname()
+                        ,person.getLastname()
+                );
+            }
+            
+        }
+    }
+    
 }

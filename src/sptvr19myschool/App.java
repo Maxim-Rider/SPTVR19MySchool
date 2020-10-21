@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package sptvr19myschool;
 
 import java.util.Scanner;
@@ -10,30 +6,43 @@ import sptvr19myschool.entity.Person;
 import sptvr19myschool.tools.managers.PersonManager;
 import java.util.ArrayList;
 import static java.util.Collections.list;
+import java.util.List;
+import sptvr19myschool.entity.Subject;
+import sptvr19myschool.tools.managers.SubjectManager;
+import sptvr19myschool.tools.severs.SaveToFile;
 
-/**
- *
- * @author Comp
- */
+
 class App {
     private Scanner scanner = new Scanner(System.in);
     
-    public void run() {
+    private  List<Person> listPersons = new ArrayList<>(); 
+    private  List<Subject> listSubjects = new ArrayList<>(); 
+    
+    private PersonManager personManager = new PersonManager();
+    private SubjectManager subjectManager = new SubjectManager();
+
+    public App() {
+        SaveToFile saveToFile = new SaveToFile();
+        this.listPersons = saveToFile.loadFromFile("listPersons");
+        this.listSubjects = saveToFile.loadFromFile("listSubjects");
+    }
+    
+    public void run(){
         System.out.println("--- Моя школа ---");
         boolean repeat = true;
-        do {  
-            System.out.println("Задачи: ");
-            System.out.println("0. Выход из программы.");
-            System.out.println("1. Добавить ученика.");
-            System.out.println("2. Список учеников.");
-            System.out.println("3. Добавить учителя.");
-            System.out.println("4. Список учителей.");
-            System.out.println("5. Добавить предметы.");
-            System.out.println("6. Список предметов.");
-            System.out.println("7. Выставить оценку.");
-            System.out.println("8. Оценки ученика.");
-            System.out.println("9. Оценки по предмету.");
-            System.out.println("10. Изменить оценку.");
+        do{
+            System.out.println("Задачи:");
+            System.out.println("0. Выход из программы");
+            System.out.println("1. Добавить ученика");
+            System.out.println("2. Список учеников");
+            System.out.println("3. Добавить учителя");
+            System.out.println("4. Список учителей");
+            System.out.println("5. Добавить предмет");
+            System.out.println("6. Список предметов");
+            System.out.println("7. Выставить оценку");
+            System.out.println("8. Оценки ученика");
+            System.out.println("9. Оценки по предмету");
+            System.out.println("10. Изменить оценку");
             System.out.println("Выберите задачу:");
             String task = scanner.nextLine();
             switch (task) {
@@ -42,23 +51,26 @@ class App {
                     repeat = false;
                     break;
                 case "1":
-                    PersonManager personManager = new PersonManager();
-                    Person student personManager.createPerson();
+                    Person student = personManager.createPerson("STUDENT");
+                    personManager.addPersonToList(student, listPersons);
+                    
                     break;
                 case "2":
-                    
+                    personManager.printListStudents(listPersons);
                     break;
                 case "3":
-                    
+                    Person teacher = personManager.createPerson("TEACHER");
+                    personManager.addPersonToList(teacher, listPersons);
                     break;
                 case "4":
-                    
+                    personManager.printListTeachers(listPersons);
                     break;
                 case "5":
-                    
+                    Subject subject = subjectManager.createSubject(listPersons);
+                    subjectManager.addSubjectToList(subject, listSubjects);
                     break;
                 case "6":
-                    
+                    subjectManager.printlistSubjects(listSubjects);
                     break;
                 case "7":
                     
@@ -73,7 +85,7 @@ class App {
                     
                     break;
                 default:
-                    System.out.println("Нет такой задачи. Выберите из списка.");
+                    System.out.println("Нет такой задачи. Выберите из списка.");;
             }
         }while(repeat);
     }
