@@ -22,7 +22,7 @@ import sptvr19myschool.tools.severs.SaveToFile;
 public class JournalManager implements Serializable{
     private Scanner scanner = new Scanner(System.in);
     private SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
-    public void setMarkToUser(List<Subject> listSubjects,List<Person> listStudents, List<Journal> listJournals){
+    public void setMarkToUser(List<Subject> listSubjects,List<Person> listPersons, List<Journal> listJournals){
         System.out.println("--- Выставить оценку ---");
         System.out.println("Список предметов: ");
         for (int i = 0; i < listSubjects.size(); i++) {
@@ -40,12 +40,16 @@ public class JournalManager implements Serializable{
         int numSubject=getNumInRange("Выберите номер предмета: ", range);
         Subject subject = listSubjects.get(numSubject-1);
         System.out.println("Список учеников:");
-        for (int i = 0; i < listStudents.size(); i++) {
-            Person person = listStudents.get(i);
-            Journal journal = getOneJournal(person, subject, listJournals);
+        for (int i = 0; i < listPersons.size(); i++) {
+            Person person = listPersons.get(i);
+            int mark;
+            int indexJournal = getOneJournal(person, subject, listJournals);
             String dateStr = "";
-            if(journal.getDate() != null){
-                dateStr = sdf.format(journal.getDate());
+            if(indexJournal<0){
+                mark = 0;
+            }else{
+                mark = listJournals.get(indexJournal).getMark();
+                dateStr = sdf.format(listJournals.get(indexJournal).getDate());
             }
             if("STUDENT".equals(person.getRole())){
                 System.out.printf("%d. %s %s, оценка по предмету: %s - %d, дата: %s%n"
@@ -53,52 +57,45 @@ public class JournalManager implements Serializable{
                         ,person.getFirstname()
                         ,person.getLastname()
                         ,subject.getName()
-                        ,journal.getMark()
+                        ,mark
                         ,dateStr
                 );
             }
         }
         System.out.print("Выбрать ученика: ");
-        range = new int[]{0,listStudents.size()};
+        range = new int[]{0,listPersons.size()};
         int numStudent= getNumInRange("Выберите номер студента: ", range);
-        Person student = listStudents.get(numStudent-1);
+        Person student = listPersons.get(numStudent-1);
         range = new int[]{0,5};
         System.out.print("Оценка: ");
         int mark = getNumInRange("Выберите оценку от 1 до 5: ", range);
         Calendar c = new GregorianCalendar();
-        Journal newOrUpdateJournal = getOneJournal(student, subject, listJournals);
-
-        if(newOrUpdateJournal.getMark()== null){
+        int indexJournals = getOneJournal(student, subject, listJournals);
+        if(indexJournals < 0){
+            Journal newOrUpdateJournal = new Journal();
             newOrUpdateJournal.setSubject(subject);
             newOrUpdateJournal.setStudent(student);
             newOrUpdateJournal.setMark(mark);
             newOrUpdateJournal.setDate(c.getTime());
+            listJournals.add(newOrUpdateJournal);
         }else{
-            int index = -1;
-            for (int i = 0; i < listJournals.size(); i++) {
-                Journal journ = listJournals.get(i);
-                if(journ.equals(newOrUpdateJournal)){
-                    index = i;
-                    break;
-                }
-            }
-            listJournals.get(index).setMark(mark);
-            listJournals.get(index).setDate(c.getTime());
+            listJournals.get(indexJournals).setMark(mark);
+            listJournals.get(indexJournals).setDate(c.getTime());
         }
         Saveable saveable = new SaveToFile();
         saveable.saveToFile(listJournals, "listJournals");
 
     }
 
-    private Journal getOneJournal(Person person, Subject subject, List<Journal> listJournals) {
+    private int getOneJournal(Person person, Subject subject, List<Journal> listJournals) {
         for (int i = 0; i < listJournals.size(); i++) {
             Journal journal = listJournals.get(i);
-            if(person.equals(journal.getStudent())
+            if("STUDENT".equals(person.getRole()) && person.equals(journal.getStudent())
                 && subject.equals(journal.getSubject())){
-                return journal;
+                return i;
             }
         }
-        return new Journal();
+        return -1;
     }
 
     private int getNumInRange(String text, int[] range){
@@ -116,5 +113,59 @@ public class JournalManager implements Serializable{
                 System.out.println(text);
             }
         }while(true);
+    }
+    
+    public void printMarksUser(List<Person> listPersons,List<Journal> listJournals) {
+        System.out.println("--- Список учеников ---");
+        for (int i = 0; i < listPersons.size(); i++) {
+            Person person = listPersons.get(i);
+            if("STUDENT".equals(person.getRole())){
+                System.out.printf("%d. %s %s%n"
+                        ,i+1
+                        ,person.getFirstname()
+                        ,person.getLastname()
+                );
+            }
+        }
+        System.out.println("Выберите номер ученика");
+        int[] range = {0,listPersons.size()};
+        int numStudent = this.getNumInRange("Выберите из списка учеников", range);
+        Person student = listPersons.get(numStudent-1);
+        for (int i = 0; i < listJournals.size(); i++) {
+            Journal journal = listJournals.get(i);
+            if(journal.getStudent().equals(student)){
+                System.out.printf("%d. %s %s. Предмет \"%s\". Оценка: %d%n"
+                        ,i+1
+                        ,journal.getStudent().getFirstname()
+                        ,journal.getStudent().getLastname()
+                        ,journal.getSubject().getName()
+                        ,journal.getMark()
+                );
+            }
+        }
+    }
+
+    public void printMarksForSubject(List<Journal> listJournals, List<Subject>listSubjects) {
+        System.out.println("Список предметов: ");
+        for (int i = 0; i < listSubjects.size(); i++) {
+            System.out.printf("%d. %s%n",i+1,listSubjects.get(i).getName());
+        }
+        System.out.println("Выберите номер предмета: ");
+        int[] range ={0, listJournals.size()};
+        int numSubject = getNumInRange("Выберите номер из списка", range);
+        Subject subject = listSubjects.get(numSubject - 1);
+        for (int i = 0; i < listJournals.size(); i++) {
+            if(!subject.equals(listJournals.get(i).getSubject())) continue;
+            System.out.printf("%d. %s %s. Предмет \"%s\". Оценка: %d%n"
+                    ,i+1
+                    ,listJournals.get(i).getStudent().getFirstname()
+                    ,listJournals.get(i).getStudent().getLastname()
+                    ,listJournals.get(i).getSubject().getName()
+                    ,listJournals.get(i).getMark()
+            );
+
+        }
+
+
     }
 }

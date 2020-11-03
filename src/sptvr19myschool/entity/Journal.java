@@ -4,6 +4,7 @@ package sptvr19myschool.entity;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 
 public class Journal implements Serializable{
@@ -67,5 +68,42 @@ public class Journal implements Serializable{
                 + '}';
     }
     
-}
 
+
+@Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.student);
+        hash = 97 * hash + Objects.hashCode(this.subject);
+        hash = 97 * hash + Objects.hashCode(this.mark);
+        hash = 97 * hash + Objects.hashCode(this.date);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Journal other = (Journal) obj;
+        if (!Objects.equals(this.student, other.student)) {
+            return false;
+        }
+        if (!Objects.equals(this.subject, other.subject)) {
+            return false;
+        }
+        if (!Objects.equals(this.mark, other.mark)) {
+            return false;
+        }
+        if (!Objects.equals(this.date, other.date)) {
+            return false;
+        }
+        return true;
+    }
+}
